@@ -1,0 +1,205 @@
+﻿@{
+    ViewBag.Title = "图书类别";
+    ViewBag.Name = "Category";
+}
+
+<div class="span12">
+    <div id="toolbar" class="btn-group">
+        <button id="btn_add" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+        </button>
+        <button id="btn_save" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-save" aria-hidden="true"></span>保存
+        </button>
+        <button id="btn_delete" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+        </button>
+        <span class="alert-danger" id="error"></span>
+    </div>
+    <table id="category_table"></table>
+</div>
+
+<script>
+    $(function () {
+        $("#category_table").bootstrapTable({
+            dataType: 'json',
+            contentType: "application/x-www-form-urlencoded",
+            toolbar: "#toolbar",
+            idField: "Id",
+            method: 'GET',
+            pagination: true,
+            showRefresh: true,
+            search: true,
+            clickToSelect: true,
+            cache: false,
+            striped: true,
+            sidePagination: "server",
+            showColumns: true,
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [10, 25, 50, 100],
+            uniqueId: "Id",
+            showExport: true,
+            exportDataType: 'all',
+            queryParams: queryParams,
+            responseHandler: responseHandler,
+            url: "/Category/GetCategory",
+            height: 450,
+            columns: [{
+                checkbox: true
+            },
+            {
+                field: "category_id",
+                title: "类别编号"
+            },
+            {
+                field: "category",
+                title: "类别名称",
+                editable: {
+                    type: 'text',
+                    title: '类别名称',
+                    validate: function (v) {
+                        if (!v) return '类别名称不能为空';
+
+                    }
+                }
+            }],
+            onEditableSave: function (field, row, oldValue, $el) {
+                $("#category_table").bootstrapTable("resetView");
+                /*如果行数据的编号小于1的话，说明正在编辑新建的数据项，暂时不需要进行保存*/
+                if (row.category_id < 0) {
+                    return;
+                }
+                $.ajax({
+                    type: "post",
+                    url: "/Category/UpdateCategory",
+                    data: { Category: row },
+                    dataType: 'JSON',
+                    success: function (data, status) {
+                        if (status == "success") {
+                            toastr.success('编辑成功！');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('编辑失败,请稍后重试！');
+                        row = oldValue;
+                    },
+                    complete: function () {
+
+                    }
+                });
+            }
+        });
+    });
+    function queryParams(params) {
+        var param = {
+            name: $(".search input").val(),
+            limit: this.limit, // 页面大小
+            offset: this.offset, // 页码
+            pageIndex: this.pageNumber,
+            pageSize: this.pageSize
+        }
+        return param;
+    }
+    function responseHandler(res) {
+        if (res) {
+            return {
+                "rows": res.rows,
+                "total": res.total
+            };
+        } else {
+            return {
+                "rows": [],
+                "total": 0
+            };
+        }
+    }
+    var table = $("#category_table");
+    var addButton = $("#btn_add");
+    var nextItemId = -1;
+    addButton.click(function () {
+        table.bootstrapTable('insertRow', {
+            index: 0, row: { category_id: nextItemId, category: "" }
+        });
+        nextItemId = nextItemId - 1;
+    });
+    var saveButton = $("#btn_save");
+    saveButton.click(function () {
+        var rowSelected = table.bootstrapTable('getSelections');
+        var to_save_items = [];
+        for(var i=0;i<rowSelected.length;i++)
+        {
+            row = rowSelected[i];
+            if (row.category_id < 0) {
+                for (var column in row) {
+                    if (row[column] == "") {
+                        toastr.error("请输入数据");
+                        return;
+                    }
+                }
+                to_save_items.push(row);
+            }
+        }
+        if(to_save_items.length == 0)
+        {
+            toastr.info("没有要进行保存的数据! ");
+        }
+        else {
+            $.ajax({
+                type: "Post",
+                url: "/Category/AddCategory",
+                data: { categorys: to_save_items },
+                success: function (data) {
+                    if (data.result) {
+                        toastr.success("数据保存成功！");
+                    }
+                    else {
+                        toastr.error("数据保存失败，请稍后重试！");
+                    }
+                    table.bootstrapTable('refresh', {});
+                },
+                error: function () {
+                    toastr.error("数据保存失败，请稍后重试！");
+                    table.bootstrapTable('refresh', {});
+                }
+            });
+        }
+    });
+    var delButton = $("#btn_delete");
+    delButton.click(function () {
+        var rowSelected = table.bootstrapTable('getSelections');
+        if (rowSelected.length < 0)
+            return;
+        var delSuccess = false;
+        itemsId = [];
+        var negativeItemsId = [];
+        for (var i = 0; i < rowSelected.length; i++) {
+            if (rowSelected[i].category_id > 0) {
+                itemsId.push(rowSelected[i].category_id);
+            }
+            else {
+                negativeItemsId.push(rowSelected[i].category_id);
+            }
+        }
+
+        //移除编号为负的行，即没有保存到数据库中的项
+        table.bootstrapTable('remove', { field: 'category_id', values: negativeItemsId });
+        if (itemsId.length == 0)
+            return;
+        $.ajax({
+            type: "Post",
+            url: "/Category/DeleteCategory",
+            data: { categoryIdList: itemsId },
+            success: function () {
+                toastr.success("删除成功! ");
+                table.bootstrapTable('refresh', {});
+            },
+            error: function () {
+                toastr.error('删除失败,请稍后重试！');
+                table.bootstrapTable('refresh', {});
+            }
+        });
+    });
+</script>
+

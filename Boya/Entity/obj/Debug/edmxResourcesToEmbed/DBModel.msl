@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="bookmanagementModelStoreContainer" CdmEntityContainer="bookmanagementEntities">
+    <EntitySetMapping Name="book_info">
+      <EntityTypeMapping TypeName="bookmanagementModel.book_info">
+        <MappingFragment StoreEntitySet="book_info">
+          <ScalarProperty Name="ISBN" ColumnName="ISBN" />
+          <ScalarProperty Name="book_name" ColumnName="book_name" />
+          <ScalarProperty Name="author" ColumnName="author" />
+          <ScalarProperty Name="press" ColumnName="press" />
+          <ScalarProperty Name="edition" ColumnName="edition" />
+          <ScalarProperty Name="publish_time" ColumnName="publish_time" />
+          <ScalarProperty Name="price" ColumnName="price" />
+          <ScalarProperty Name="category_id" ColumnName="category_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="category_info">
+      <EntityTypeMapping TypeName="bookmanagementModel.category_info">
+        <MappingFragment StoreEntitySet="category_info">
+          <ScalarProperty Name="category_id" ColumnName="category_id" />
+          <ScalarProperty Name="category" ColumnName="category" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

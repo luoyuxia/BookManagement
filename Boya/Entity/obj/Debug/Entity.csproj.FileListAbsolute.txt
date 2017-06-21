@@ -1,0 +1,9 @@
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\bin\Debug\Entity.dll.config
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\bin\Debug\Entity.dll
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\bin\Debug\Entity.pdb
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\bin\Debug\EntityFramework.dll
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\bin\Debug\EntityFramework.xml
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\bin\Debug\zh-Hans\EntityFramework.resources.dll
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\obj\Debug\Entity.csprojResolveAssemblyReference.cache
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\obj\Debug\Entity.dll
+C:\Users\qi\Documents\Visual Studio 2015\Projects\Boya\Entity\obj\Debug\Entity.pdb

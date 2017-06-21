@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="bookmanagementModel.Store" Provider="MySql.Data.MySqlClient" ProviderManifestToken="5.7" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="book_info">
+    <Key>
+      <PropertyRef Name="ISBN" />
+    </Key>
+    <Property Name="ISBN" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="book_name" Type="varchar" MaxLength="30" Nullable="false" />
+    <Property Name="author" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="press" Type="varchar" MaxLength="20" />
+    <Property Name="edition" Type="varchar" MaxLength="10" />
+    <Property Name="publish_time" Type="varchar" MaxLength="20" />
+    <Property Name="price" Type="float" />
+    <Property Name="category_id" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="category_info">
+    <Key>
+      <PropertyRef Name="category_id" />
+    </Key>
+    <Property Name="category_id" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="category" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <Association Name="book_info_ibfk_1">
+    <End Role="category_info" Type="Self.category_info" Multiplicity="1" />
+    <End Role="book_info" Type="Self.book_info" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="category_info">
+        <PropertyRef Name="category_id" />
+      </Principal>
+      <Dependent Role="book_info">
+        <PropertyRef Name="category_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="bookmanagementModelStoreContainer">
+    <EntitySet Name="book_info" EntityType="Self.book_info" Schema="bookmanagement" store:Type="Tables" />
+    <EntitySet Name="category_info" EntityType="Self.category_info" Schema="bookmanagement" store:Type="Tables" />
+    <AssociationSet Name="book_info_ibfk_1" Association="Self.book_info_ibfk_1">
+      <End Role="category_info" EntitySet="category_info" />
+      <End Role="book_info" EntitySet="book_info" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

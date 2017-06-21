@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    ViewBag.Name = "Home";
+}
+
+<div class="span12">
+    <div id="toolbar" class="btn-group">
+        <button id="btn_add" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+        </button>
+        <button id="btn_save" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-save" aria-hidden="true"></span>保存
+        </button>
+        <button id="btn_delete" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+        </button>
+        <span class="alert-danger" id="error"></span>
+    </div>
+    <table id="book_table"></table>
+</div>
+<script>
+    $(function () {
+        $("#book_table").bootstrapTable({
+            dataType: 'json',
+            contentType: "application/x-www-form-urlencoded",
+            toolbar: "#toolbar",
+            idField: "Id",
+            method: 'GET',
+            pagination: true,
+            showRefresh: true,
+            search: true,
+            clickToSelect: true,
+            cache: false,
+            striped: true,
+            sidePagination: "server",
+            showColumns: true,
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [10, 25, 50, 100],
+            uniqueId: "Id",
+            showExport: true,
+            exportDataType: 'all',
+            queryParams: queryParams,
+            responseHandler: responseHandler,
+            url: "/Category/GetCategory",
+            height: 450,
+            columns: [{
+                checkbox: true
+            },
+            {
+                field: "Id",
+                title: "类别编号"
+            },
+            {
+                field: "Name",
+                title: "类别名称",
+                editable: {
+                    type: 'text',
+                    title: '类别名称',
+                    validate: function (v) {
+                        if (!v) return '类别名称不能为空';
+
+                    }
+                }
+            },
+            {
+                field: "Description",
+                title: "类别描述",
+                editable: {
+                    type: 'text',
+                    title: '类别描述',
+                    validate: function (v) {
+                        if (!v) return '类别描述不能为空';
+                    }
+                }
+
+            }],
+            onEditableSave: function (field, row, oldValue, $el) {
+                $("#tb_category").bootstrapTable("resetView");
+                /*如果行数据的编号小于1的话，说明正在编辑新建的数据项，暂时不需要进行保存*/
+                if (row.Id < 0) {
+                    return;
+                }
+                $.ajax({
+                    type: "post",
+                    url: "/Category/UpdateCategory",
+                    data: { category: row },
+                    dataType: 'JSON',
+                    success: function (data, status) {
+                        if (status == "success") {
+                            toastr.success('编辑成功！');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('编辑失败,请稍后重试！');
+                        row = oldValue;
+                    },
+                    complete: function () {
+
+                    }
+                });
+            }
+        });
+    });
+    function queryParams(params) {
+        var param = {
+            name: $(".search input").val(),
+            limit: this.limit, // 页面大小
+            offset: this.offset, // 页码
+            pageindex: this.pageNumber,
+            pageSize: this.pageSize
+        }
+        return param;
+    }
+    function responseHandler(res) {
+        if (res) {
+            return {
+                "rows": res.rows,
+                "total": res.total
+            };
+        } else {
+            return {
+                "rows": [],
+                "total": 0
+            };
+        }
+    }
+</script>
+

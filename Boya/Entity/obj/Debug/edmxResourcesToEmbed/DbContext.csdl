@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BookManagementModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="book_info">
+    <Key>
+      <PropertyRef Name="ISBN" />
+    </Key>
+    <Property Name="ISBN" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="book_name" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="author" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="press" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="edition" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="publish_time" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="price" Type="Single" />
+    <Property Name="category_id" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="category_info" Relationship="Self.book_info_category_info" FromRole="book_info" ToRole="category_info" />
+  </EntityType>
+  <EntityType Name="category_info">
+    <Key>
+      <PropertyRef Name="category_id" />
+    </Key>
+    <Property Name="category_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="category" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="book_info" Relationship="Self.book_info_category_info" FromRole="category_info" ToRole="book_info" />
+  </EntityType>
+  <Association Name="book_info_category_info">
+    <End Role="category_info" Type="Self.category_info" Multiplicity="1" />
+    <End Role="book_info" Type="Self.book_info" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="category_info">
+        <PropertyRef Name="category_id" />
+      </Principal>
+      <Dependent Role="book_info">
+        <PropertyRef Name="category_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="BookManagementEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="book_info" EntityType="Self.book_info" />
+    <EntitySet Name="category_info" EntityType="Self.category_info" />
+    <AssociationSet Name="book_info_category_info" Association="Self.book_info_category_info">
+      <End Role="category_info" EntitySet="category_info" />
+      <End Role="book_info" EntitySet="book_info" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

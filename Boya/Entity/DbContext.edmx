@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="BookManagementModel.Store" Provider="MySql.Data.MySqlClient" ProviderManifestToken="5.7" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="book_info">
+          <Key>
+            <PropertyRef Name="ISBN" />
+          </Key>
+          <Property Name="ISBN" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="book_name" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="author" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="press" Type="varchar" MaxLength="20" />
+          <Property Name="edition" Type="varchar" MaxLength="10" />
+          <Property Name="publish_time" Type="varchar" MaxLength="20" />
+          <Property Name="price" Type="float" />
+          <Property Name="category_id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="category_info">
+          <Key>
+            <PropertyRef Name="category_id" />
+          </Key>
+          <Property Name="category_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="category" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <Association Name="book_info_category_info">
+          <End Role="category_info" Type="Self.category_info" Multiplicity="1" />
+          <End Role="book_info" Type="Self.book_info" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="category_info">
+              <PropertyRef Name="category_id" />
+            </Principal>
+            <Dependent Role="book_info">
+              <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="BookManagementModelStoreContainer">
+          <EntitySet Name="book_info" EntityType="Self.book_info" Schema="bookmanagement" store:Type="Tables" />
+          <EntitySet Name="category_info" EntityType="Self.category_info" Schema="bookmanagement" store:Type="Tables" />
+          <AssociationSet Name="book_info_category_info" Association="Self.book_info_category_info">
+            <End Role="category_info" EntitySet="category_info" />
+            <End Role="book_info" EntitySet="book_info" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BookManagementModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="book_info">
+          <Key>
+            <PropertyRef Name="ISBN" />
+          </Key>
+          <Property Name="ISBN" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="book_name" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="author" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="press" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="edition" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="publish_time" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="price" Type="Single" />
+          <Property Name="category_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="category_info" Relationship="Self.book_info_category_info" FromRole="book_info" ToRole="category_info" />
+        </EntityType>
+        <EntityType Name="category_info">
+          <Key>
+            <PropertyRef Name="category_id" />
+          </Key>
+          <Property Name="category_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="category" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="book_info" Relationship="Self.book_info_category_info" FromRole="category_info" ToRole="book_info" />
+        </EntityType>
+        <Association Name="book_info_category_info">
+          <End Role="category_info" Type="Self.category_info" Multiplicity="1" />
+          <End Role="book_info" Type="Self.book_info" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="category_info">
+              <PropertyRef Name="category_id" />
+            </Principal>
+            <Dependent Role="book_info">
+              <PropertyRef Name="category_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="BookManagementEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="book_info" EntityType="Self.book_info" />
+          <EntitySet Name="category_info" EntityType="Self.category_info" />
+          <AssociationSet Name="book_info_category_info" Association="Self.book_info_category_info">
+            <End Role="category_info" EntitySet="category_info" />
+            <End Role="book_info" EntitySet="book_info" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BookManagementModelStoreContainer" CdmEntityContainer="BookManagementEntities">
+          <EntitySetMapping Name="book_info">
+            <EntityTypeMapping TypeName="BookManagementModel.book_info">
+              <MappingFragment StoreEntitySet="book_info">
+                <ScalarProperty Name="ISBN" ColumnName="ISBN" />
+                <ScalarProperty Name="book_name" ColumnName="book_name" />
+                <ScalarProperty Name="author" ColumnName="author" />
+                <ScalarProperty Name="press" ColumnName="press" />
+                <ScalarProperty Name="edition" ColumnName="edition" />
+                <ScalarProperty Name="publish_time" ColumnName="publish_time" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="category_id" ColumnName="category_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="category_info">
+            <EntityTypeMapping TypeName="BookManagementModel.category_info">
+              <MappingFragment StoreEntitySet="category_info">
+                <ScalarProperty Name="category_id" ColumnName="category_id" />
+                <ScalarProperty Name="category" ColumnName="category" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

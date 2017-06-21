@@ -1,0 +1,304 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    ViewBag.Name = "Book";
+}
+
+<div class="span12">
+    <div id="toolbar" class="btn-group">
+        <button id="btn_add" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+        </button>
+        <button id="btn_save" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-save" aria-hidden="true"></span>保存
+        </button>
+        <button id="btn_delete" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
+        </button>
+        <span class="alert-danger" id="error"></span>
+    </div>
+    <table id="book_table"></table>
+</div>
+<script>
+    $(function () {
+        $("#book_table").bootstrapTable({
+            dataType: 'json',
+            contentType: "application/x-www-form-urlencoded",
+            toolbar: "#toolbar",
+            idField: "ISBN",
+            method: 'GET',
+            pagination: true,
+            showRefresh: true,
+            search: true,
+            clickToSelect: true,
+            cache: false,
+            striped: true,
+            sidePagination: "server",
+            showColumns: true,
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [10, 25, 50, 100],
+            uniqueId: "Id",
+            showExport: true,
+            exportDataType: 'all',
+            queryParams: queryParams,
+            responseHandler: responseHandler,
+            url: "/Book/GetAllBook",
+            height: 450,
+            columns: [{
+                checkbox: true
+            },
+            {
+                field: "ISBN",
+                title: "图书编号",
+                editable: {
+                    type: 'text',
+                    title: '图书编号',
+                    validate: function (v) {
+                        if (!v) return '图书编号不能为空';
+                    }
+                }
+
+            },
+            {
+                field: "book_name",
+                title: "图书名称",
+                editable: {
+                    type: 'text',
+                    title: '图书名称',
+                    validate: function (v) {
+                        if (!v) return '图书名称不能为空';
+                    }
+                }
+            },
+            {
+                field: "author",
+                title: "图书作者",
+                editable: {
+                    type: 'text',
+                    title: '图书作者',
+                    validate: function (v) {
+                        if (!v) return '图书作者不能为空';
+                    }
+                }
+            },
+            {
+                field: "press",
+                title: "出版社",
+                editable: {
+                    type: 'text',
+                    title: '出版社',
+                    validate: function (v) {
+                        if (!v) return '图书版本不能为空';
+                    }
+                }
+            },
+              {
+                  field: "edition",
+                  title: "图书版本",
+                  editable: {
+                      type: 'text',
+                      title: '图书版本',
+                      validate: function (v) {
+                          if (!v) return '图书版本不能为空';
+                      }
+                  }
+              },
+              {
+                  field: "publish_time",
+                  title: "出版日期",
+                  formatter: function (value, row, index) {
+                      var date = moment(value);
+                      var formatDate = date.format("YYYY-MM-DD");
+                      return formatDate;
+               //       return date.format("yyyy-MM-dd");
+                  },
+                  editable: {
+                      type: 'date',
+                      title: '出版日期',
+                      validate:function(v)
+                      {
+                          if(v=="")
+                          {
+                              return "出版日期不能为空！";
+                          }
+                      }
+                  }
+              },
+            {
+                field: "price",
+                title: "图书定价",
+                editable: {
+                    type: 'text',
+                    title: '图书定价',
+                    validate: function (v) {
+                        var r = /^\d+(\.\d{1,2})?$/
+                        if (!r.test(v))
+                            return "请输入两位以内的小数";
+                        /*      if(isNaN(v)) return '商品定价必须是数字';
+                              var price = parseFloat(v);
+                              if(price<=0) return '商品定价需要是正数';
+                              */
+                    }
+                }
+            },
+            {
+                field: "category_id",
+                title: "图书类别",
+                editable: {
+                    type: 'select',
+                    title: '商品类别',
+                    source: function () {
+                        var result = [];
+                        $.ajax({
+                            url: '/Category/GetAllCategory',
+                            async: false,
+                            type: "get",
+                            data: {},
+                            success: function (data, status) {
+                                $.each(data, function (key, value) {
+                                    result.push({ value: value.ID, text: value.Name });
+                                });
+                            }
+                        });
+                        return result;
+                    }
+                }
+            }]
+            ,
+            onEditableSave: function (field, row, oldValue, $el) {
+                /*如果行数据的编号小于1的话，说明正在编辑新建的数据项，暂时不需要进行保存*/
+                $("#book_table").bootstrapTable("resetView");
+                if (row.Id < 0 || oldValue =="" || row[field] =="") {
+                    return;
+                }
+                $.ajax({
+                    type: "post",
+                    url: "/Book/UpdateBook",
+                    data: { goods: row },
+                    dataType: 'JSON',
+                    success: function (data, status) {
+                        if (status == "success") {
+                            toastr.success('编辑成功！');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('编辑失败,请稍后重试！');
+                        row = oldValue;
+                    },
+                    complete: function () {
+
+                    }
+                });
+            }
+        });
+    });
+    function queryParams(params) {
+        var param = {
+            name: $(".search input").val(),
+            limit: this.limit, // 页面大小
+            offset: this.offset, // 页码
+            pageindex: this.pageNumber,
+            pageSize: this.pageSize
+        }
+        return param;
+    }
+    function responseHandler(res) {
+        if (res) {
+            return {
+                "rows": res.rows,
+                "total": res.total
+            };
+        } else {
+            return {
+                "rows": [],
+                "total": 0
+            };
+        }
+    }
+
+    var addButton = $("#btn_add");
+    var table = $("#book_table");
+    addButton.click(function () {
+        table.bootstrapTable('insertRow', {
+            index: 0, row: {
+                ISBN: "", book_name: "", author: "",
+                press: "", edition: "", publish_time: "",
+                price: "", category_id:""
+            }
+        });
+    });
+    var saveButton = $("#btn_save");
+    saveButton.click(function () {
+        var rowSelected = table.bootstrapTable('getSelections');
+        //可以进行保存的商品项
+        var to_save_items = [];
+        for (var i = 0; i < rowSelected.length; i++) {
+            row = rowSelected[i];
+                //如果某行数据的某列无效，不进行保存
+            for (var column in row) {
+                if (row[column] == "") {
+                    toastr.error('数据有误！')
+                    return;
+                }
+            }
+            to_save_items.push(row);
+        }
+        if (to_save_items.length == 0) {
+            toastr.info("没有要进行保存的数据！");
+        }
+        else {
+            $.ajax({
+                type: "Post",
+                url: "/Book/AddBooks",
+                data: { books: to_save_items },
+                success: function (data) {
+                    if (data.result) {
+                        toastr.success("数据保存成功！");
+                    }
+                    else {
+                        toastr.error("数据保存失败，请稍后重试！");
+                    }
+                    table.bootstrapTable('refresh', {});
+                },
+                error: function () {
+                    toastr.error("数据保存失败，请稍后重试！");
+                    table.bootstrapTable('refresh', {});
+                }
+            });
+        }
+    });
+    var deleteButton = $("#btn_delete");
+    deleteButton.click(function () {
+        var rowSelected = table.bootstrapTable('getSelections');
+        if (rowSelected.length < 0)
+            return;
+        var delSuccess = false;
+        itemsId = [];
+        for (var i = 0; i < rowSelected.length; i++) {
+            itemsId.push(rowSelected[i].ISBN);
+        }
+        if (itemsId.length == 0)
+            return;
+        $.ajax({
+            type: "Post",
+            url: "Book/DeleteBooks",
+            data: { BooksISBN: itemsId },
+            success: function (data, status) {
+                if (data.result == "success")
+                    toastr.success("删除成功! ");
+                else if (data.result == "fail")
+                {
+                    toastr.error("删除失败! ");
+                }
+                table.bootstrapTable('refresh', {});
+            },
+            error: function () {
+                toastr.error('删除失败,请稍后重试！');
+                table.bootstrapTable('refresh', {});
+            }
+        });
+    });
+</script>
+
